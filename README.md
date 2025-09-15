@@ -4,10 +4,10 @@ This README collects useful commands and links to install common DevOps, CI/CD, 
 
 > **Note:** Replace all `<VERSION>`, `<your-server-ip>`, `<jenkins-ip>`, `<sonar-ip-address>`, `<ACCOUNT_ID>`, and similar placeholders with your actual values.
 ---
-# For more project check out 
-## https://harishnshetty.github.io/projects.html
+
 ---
-![img alt](https://github.com/harishnshetty/amazon-Devsecops/blob/c69c0f8f0e7b0e75071f44eb79106114db4435a0/img.png)
+<img width="1285" height="733" alt="image" src="https://github.com/user-attachments/assets/234aa5f6-c9aa-4e6f-85c0-98c27d9f0b15" />
+
 ---
 ## Table of Contents
 
