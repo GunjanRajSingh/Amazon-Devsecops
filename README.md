@@ -3,9 +3,7 @@
 This README collects useful commands and links to install common DevOps, CI/CD, and security tooling on Ubuntu systems. It has been cleaned up, organized, and corrected for clarity. Always review commands for your environment and needs.
 
 > **Note:** Replace all `<VERSION>`, `<your-server-ip>`, `<jenkins-ip>`, `<sonar-ip-address>`, `<ACCOUNT_ID>`, and similar placeholders with your actual values.
----
 
----
 <img width="1285" height="733" alt="image" src="https://github.com/user-attachments/assets/234aa5f6-c9aa-4e6f-85c0-98c27d9f0b15" />
 
 ---
