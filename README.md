@@ -12,17 +12,11 @@ This README collects useful commands and links to install common DevOps, CI/CD, 
 - [Prerequisites](#prerequisites)
 - [System Update & Common Packages](#system-update--common-packages)
 - [Java](#java)
-- [Jenkins](#jenkins)
 - [Docker](#docker)
 - [Trivy](#trivy-vulnerability-scanner)
 - [Prometheus](#prometheus)
 - [Node Exporter](#node-exporter)
 - [Grafana](#grafana)
-- [Jenkins Plugins to Install](#jenkins-plugins-to-install)
-- [Jenkins Credentials to Store](#jenkins-credentials-to-store)
-- [Jenkins Tools Configuration](#jenkins-tools-configuration)
-- [Jenkins System Configuration](#jenkins-system-configuration)
-- [EKS ALB Ingress Kubernetes Setup Guide](#eks-alb-ingress-kubernetes-setup-guide)
 - [Monitor Kubernetes with Prometheus](#monitor-kubernetes-with-prometheus)
 - [Installing Argo CD](#installing-argo-cd)
 - [Notes and Recommendations](#notes-and-recommendations)
@@ -36,7 +30,6 @@ This README collects useful commands and links to install common DevOps, CI/CD, 
 | HTTP            | 80    |
 | HTTPS           | 443   |
 | SSH             | 22    |
-| Jenkins         |       |
 | SonarQube       |       |
 | Prometheus      |       |
 | Node Exporter   |       |
@@ -87,35 +80,6 @@ sudo apt install -y openjdk-21-jdk
 Verify:
 ```bash
 java --version
-```
-
----
-
-## Jenkins
-
-Official docs: https://www.jenkins.io/doc/book/installing/linux/
-
-```bash
-sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
-  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
-  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
-  /etc/apt/sources.list.d/jenkins.list > /dev/null
-
-sudo apt update
-sudo apt install -y jenkins
-sudo systemctl enable --now jenkins
-sudo systemctl start jenkins
-sudo systemctl status jenkins
-```
-Initial admin password:
-```bash
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-```
-Then open: http://your-server-ip:8080
-
-**Note:** Jenkins requires a compatible Java runtime. Check the Jenkins documentation for supported Java versions.
-
 ---
 
 ## Docker
@@ -140,14 +104,10 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Add user to docker group (log out / in or newgrp to apply)
+```
 sudo usermod -aG docker $USER
 newgrp docker
 docker ps
-```
-If Jenkins needs Docker access:
-```bash
-sudo usermod -aG docker jenkins
-sudo systemctl restart jenkins
 ```
 Check Docker status:
 ```bash
@@ -226,7 +186,7 @@ sudo systemctl enable --now prometheus
 sudo systemctl start prometheus
 sudo systemctl status prometheus
 ```
-Access: http://ip-address:9090
+Access: http://<VM_IP>:9090
 
 ---
 
@@ -308,7 +268,7 @@ sudo systemctl enable --now grafana-server
 sudo systemctl start grafana-server
 sudo systemctl status grafana-server
 ```
-Access: http://ip-address:3000
+Access: http://<VM_IP>:3000
 
 ---
 
@@ -322,22 +282,6 @@ Docs: https://grafana.com/grafana/dashboards/9964-jenkins-performance-and-health
   - kubernetes    18283
 Docs: https://grafana.com/grafana/dashboards/18283-kubernetes-dashboard/
 
-
-
-## Jenkins Plugins to Install
-
-- Eclipse Temurin installer Plugin
-- NodeJS
-- Email Extension Plugin
-- OWASP Dependency-Check Plugin
-- Pipeline: Stage View Plugin
-- SonarQube Scanner for Jenkins
-- Prometheus metrics plugin
-- Docker API Plugin
-- Docker Commons Plugin
-- Docker Pipeline
-- Docker plugin
-- docker-build-step
 
 ---
 ## SonarQube Docker Container Run for Analysis
@@ -364,17 +308,6 @@ docker run -d --name sonarqube \
 Webhook example:  
 `http://<jenkins-ip>:8080/sonarqube-webhook/`
 
----
-
-## Jenkins Tools Configuration
-
-- JDK
-- SonarQube Scanner installations [sonar-scanner]
-- Node
-- Dependency-Check installations [dp-check]
-- Maven installations
-
-- Docker installations
 
 ---
 
@@ -402,7 +335,6 @@ Webhook example:
 - Reply-To Address: example@gmail.com
 
 ---
-# Now See the configuration pipeline of the jenkins
 
 
 
@@ -550,7 +482,7 @@ helm install ingress-azure application-gateway-kubernetes-ingress/ingress-azure 
 ## 9. Deploy Your Application
 
 ```bash
-git clone https://github.com/harishnshetty/amazon-Devsecops.git
+git clone https://github.com/GunjanRajSingh/Amazon-Devsecops.git
 cd amazon-Devsecops/k8s-80
 
 kubectl apply -f .
