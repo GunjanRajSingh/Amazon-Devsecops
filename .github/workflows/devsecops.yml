@@ -149,7 +149,7 @@ jobs:
       - name: Deploy Manifests to AKS
         run: |
           az account set --subscription 32cee08e-9e85-4260-b011-934dc8e0b571
-          az aks get-credentials --resource-group myacr580.azurecr.io--name myacr580.azurecr.io --overwrite-existing
+          az aks get-credentials --resource-group MY-RG --name My-Cluster --overwrite-existing
           git clone https://github.com/GunjanRajSingh/Amazon-Devsecops.git
           cd Amazon-Devsecops/k8s-80
           kubectl create ns amazon-ns
