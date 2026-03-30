@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: amazon-app-container
-          image: gunjan37raj/amazon:latest
+          image: myacr580.azurecr.io/amazon:latest
           ports:
             - containerPort: 80
           resources:
