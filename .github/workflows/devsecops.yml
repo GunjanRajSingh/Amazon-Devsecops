@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_NAME: gunjan37raj/amazon
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # IMAGE_NAME: myacr580.azurecr.io/amazon
+      # SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      # SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       IMAGE_TAG: ${{ github.run_number }}
       K8S_NAMESPACE: amazon-ns
 
@@ -34,99 +34,110 @@ jobs:
       #     distribution: 'temurin'
       #     java-version: '17'
 
-      - name: Set up Node.js 18
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+      # - name: Set up Node.js 18
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '18'
 
-      - name: Install Dependencies
-        run: npm install
+      # - name: Install Dependencies
+      #   run: npm install
 
       - name: Log in to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: ACR Login
+        run: |
+          az acr login --name ${{ secrets.ACR_NAME }}
 
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/amazon:${{ github.sha }} .
+
+      - name: Push Image to ACR
+        run: |
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/amazon:${{ github.sha }}
     
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v4
-        with:
-          args: >
-            -Dsonar.projectKey=amazon
-            -Dsonar.projectName=amazon
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      # - name: SonarQube Scan
+      #   uses: SonarSource/sonarqube-scan-action@v4
+      #   with:
+      #     args: >
+      #       -Dsonar.projectKey=amazon
+      #       -Dsonar.projectName=amazon
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
      
-      - name: OWASP Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: "Amazon"
-          scan: "./"
-          format: "ALL"
-          out: "./reports"
+      # - name: OWASP Dependency Check
+      #   uses: dependency-check/Dependency-Check_Action@main
+      #   with:
+      #     project: "Amazon"
+      #     scan: "./"
+      #     format: "ALL"
+      #     out: "./reports"
 
-      - name: Upload OWASP Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: dependency-check-report
-          path: reports/
+      # - name: Upload OWASP Report
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: dependency-check-report
+      #     path: reports/
 
     
-      - name: Install Trivy
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update && sudo apt-get install -y trivy
+      # - name: Install Trivy
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+      #     wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+      #     echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+      #     sudo apt-get update && sudo apt-get install -y trivy
 
-      - name: Trivy File System Scan
-        run: trivy fs . > trivyfs.txt
+      # - name: Trivy File System Scan
+      #   run: trivy fs . > trivyfs.txt
 
-      - name: Upload Trivy FS Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-fs-report
-          path: trivyfs.txt
+      # - name: Upload Trivy FS Report
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: trivy-fs-report
+      #     path: trivyfs.txt
 
-      - name: Docker Login
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Docker Login
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v3
+      # # - name: Set up Docker Buildx
+      # #   uses: docker/setup-buildx-action@v3
 
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: |
-            gunjan37raj/amazon:${{ github.run_number }}
-            gunjan37raj/amazon:latest
+      # - name: Build and Push Docker Image
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: .
+      #     push: true
+      #     tags: |
+      #       gunjan37raj/amazon:${{ github.run_number }}
+      #       gunjan37raj/amazon:latest
 
-      # --------------------- TRIVY IMAGE SCAN ---------------------
-      - name: Trivy Image Scan
-        run: |
-          trivy image -f json -o trivy-image.json ${IMAGE_NAME}:${{ github.run_number }}
-          trivy image -f table -o trivy-image.txt ${IMAGE_NAME}:${{ github.run_number }}
+      # # --------------------- TRIVY IMAGE SCAN ---------------------
+      # - name: Trivy Image Scan
+      #   run: |
+      #     trivy image -f json -o trivy-image.json ${IMAGE_NAME}:${{ github.run_number }}
+      #     trivy image -f table -o trivy-image.txt ${IMAGE_NAME}:${{ github.run_number }}
 
-      - name: Upload Trivy Image Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-image-reports
-          path: |
-            trivy-image.json
-            trivy-image.txt
+      # - name: Upload Trivy Image Report
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: trivy-image-reports
+      #     path: |
+      #       trivy-image.json
+      #       trivy-image.txt
 
-      # DEPLOY TO CONTAINER
-      - name: Run Docker Container
-        run: |
-          docker run -d --name amazon -p 8000:80 ${IMAGE_NAME}:${{ github.run_number }}
+      # # DEPLOY TO CONTAINER
+      # - name: Run Docker Container
+      #   run: |
+      #     docker run -d --name amazon -p 8000:80 ${IMAGE_NAME}:${{ github.run_number }}
 
 
       - name: Set AKS Context
@@ -138,7 +149,7 @@ jobs:
       - name: Deploy Manifests to AKS
         run: |
           az account set --subscription f6d438e9-6d0c-4e92-aed1-56499c5e49d0
-          az aks get-credentials --resource-group Gunjan-All-Resource --name AKS-Cluster-Gunjan --overwrite-existing
+          az aks get-credentials --resource-group myacr580.azurecr.io--name myacr580.azurecr.io --overwrite-existing
           git clone https://github.com/GunjanRajSingh/Amazon-Devsecops.git
           cd Amazon-Devsecops/k8s-80
           kubectl create ns amazon-ns
@@ -147,19 +158,19 @@ jobs:
           kubectl get ingress -n amazon-ns -owide
 
       # --------------------- EMAIL NOTIFICATION ---------------------
-      - name: Send Email Notification
-        if: always()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.EMAIL_USER }}
-          password: ${{ secrets.EMAIL_PASS }}
-          subject: "GitHub Actions Build ${{ job.status }}: Amazon CI/CD #${{ github.run_number }}"
-          html_body: |
-            <p>Build: ${{ job.status }}</p>
-            <p>Repository: ${{ github.repository }}</p>
-            <p>Branch: ${{ github.ref_name }}</p>
-            <p>Build URL: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Workflow</a></p>
-          to: ${{ secrets.EMAIL_USER }}
-          from: ${{ secrets.EMAIL_USER }}
+      # - name: Send Email Notification
+      #   if: always()
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: smtp.gmail.com
+      #     server_port: 465
+      #     username: ${{ secrets.EMAIL_USER }}
+      #     password: ${{ secrets.EMAIL_PASS }}
+      #     subject: "GitHub Actions Build ${{ job.status }}: Amazon CI/CD #${{ github.run_number }}"
+      #     html_body: |
+      #       <p>Build: ${{ job.status }}</p>
+      #       <p>Repository: ${{ github.repository }}</p>
+      #       <p>Branch: ${{ github.ref_name }}</p>
+      #       <p>Build URL: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Workflow</a></p>
+      #     to: ${{ secrets.EMAIL_USER }}
+      #     from: ${{ secrets.EMAIL_USER }}
