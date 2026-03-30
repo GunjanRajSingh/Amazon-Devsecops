@@ -53,11 +53,11 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/amazon:${{ github.sha }} .
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/amazon:latest .
 
       - name: Push Image to ACR
         run: |
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/amazon:${{ github.sha }}
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/amazon:latest
     
       # - name: SonarQube Scan
       #   uses: SonarSource/sonarqube-scan-action@v4
